@@ -616,7 +616,7 @@ async def update():
         #Added all session infor to a new playerStats class
         playerStats = playerStatistics.statsCalc(player_id, request)
         #Def to update all user information from stats class
-        user_list = updateUserList(user_list, user, user_ign, player_id, playerStats, curr_punisher, curr_terminator, curr_general)
+        user_list_na = updateUserList(user_list, user, user_ign, player_id, playerStats, curr_punisher, curr_terminator, curr_general)
         if playerStats.pStats.new_rank != curr_rank:
             role = discord.utils.get(guild.roles, name=curr_rank)
             print('Updating: '+user)
@@ -624,7 +624,9 @@ async def update():
             await member.remove_roles(role)
             role = discord.utils.get(guild.roles, name=playerStats.pStats.new_rank)
             await member.add_roles(role)
-
+    
+    #Added updated list back to original
+    user_list = user_list_na
     max_points = 0
     max_points_user = ''
     current_general = 'None'
