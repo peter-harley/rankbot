@@ -238,6 +238,17 @@ async def on_member_join(member):
     response_msg.timestamp = datetime.datetime.utcnow()
     await channel.send(embed=response_msg)
 
+#Target user add exception handling
+async def grabTargetUser(user):
+    guild = client.get_guild(d_server)
+    member = None
+    try:
+        print('Fetching member info for {0}'.format(user))
+        member = await guild.fetch_member(user)
+    except:
+        print('Error occured getting member info for {0}'.format(user))
+    return member
+
 # Standard role add a remove function
 async def discordRemoveRole(targetRole, user, ctx=None):
     if ctx == None:
@@ -276,7 +287,8 @@ async def on_member_update(before, after):
     streaming_role = discord.utils.get(guild.roles, name='Streaming')
     activities = after.activities
     after_id = after.id
-    member = await guild.fetch_member(after_id)
+    print('Fetching member info for {0}'.format(after_id))
+    member = await grabTargetUser(after_id)
     if discord.ActivityType.streaming in activities:
         if streaming_role not in after.roles:
             print(f"{after.display_name} is streaming")
@@ -648,8 +660,7 @@ async def update():
         user_list_na = updateUserList(user_list, user, user_ign, player_id, playerStats, curr_punisher, curr_terminator, curr_general)
         if playerStats.pStats.new_rank != curr_rank:
             role = discord.utils.get(guild.roles, name=curr_rank)
-            print('Updating: ' + user)
-            member = await guild.fetch_member(user)
+            member = await grabTargetUser(user)
             await discordRemoveAndAddRole(curr_rank,playerStats.pStats.new_rank,member)
     
     user_list = user_list_na
@@ -708,16 +719,16 @@ async def update():
     user_list[max_points_user]['general'] = 1
     
     if current_general == 'None':
-        member = await guild.fetch_member(max_points_user)
+        member = await grabTargetUser(max_points_user)
         await discordAddRole('The General',member,guild)
         response_msg.add_field(name="The General",value=f"A new The General role (highest rank) has been assigned. Congrats! ```{member.name}```",inline=False)
     elif current_general == max_points_user:
-        member = await guild.fetch_member(current_general)
+        member = await grabTargetUser(current_general)
         response_msg.add_field(name="The General",value=f"The General is the same as before. ```{member.name}```",inline=False)
     else:
-        oldmember = await guild.fetch_member(current_general)
+        oldmember = await grabTargetUser(current_general)
         user_list[current_general]['general'] = 0
-        newmember = await guild.fetch_member(max_points_user)
+        newmember = await grabTargetUser(max_points_user)
         await discordReplaceRole('The General',oldmember,newmember,guild)
         response_msg.add_field(name="The General",value=f"Previous General (highest rank) has been replaced. Congrats! ```{newmember.name}```",inline=False)
 
@@ -734,16 +745,16 @@ async def update():
     user_list[max_kda_user]['terminator'] = 1
     #Terminator work
     if current_terminator == 'None':
-        member = await guild.fetch_member(max_kda_user)
+        member = await grabTargetUser(max_kda_user)
         await discordAddRole('The Terminator',member)
         response_msg.add_field(name="The Terminator",value=f"A new The Terminator role (highest KDA) has been assigned. Congrats! ```{member.name}```",inline=False)
     elif current_terminator == max_kda_user:
-        member = await guild.fetch_member(max_kda_user)
+        member = await grabTargetUser(max_kda_user)
         response_msg.add_field(name="The Terminator",value=f"The Terminator is the same as before. ```{member.name}```",inline=False)
     else:
-        oldmember = await guild.fetch_member(current_terminator)
+        oldmember = await grabTargetUser(current_terminator)
         user_list[current_terminator]['terminator'] = 0
-        newmember = await guild.fetch_member(max_kda_user)
+        newmember = await grabTargetUser(max_kda_user)
         await discordReplaceRole("The Terminator",oldmember,newmember)
         response_msg.add_field(name="The Terminator",value=f"Previous Terminator (highest KDA) has been replaced. Congrats! ```{member.name}```",inline=False)
 
@@ -760,16 +771,16 @@ async def update():
     user_list[max_adr_user]['punisher'] = 1
     #Punished work
     if current_punisher == 'None':
-        member = await guild.fetch_member(max_adr_user)
+        member = await grabTargetUser(max_adr_user)
         await discordAddRole("The Punisher",member,guild)
         response_msg.add_field(name="The Punisher",value=f"A new The Punisher role (highest ADR) has been assigned. Congrats! ```{member.name}```",inline=False)
     elif current_punisher == max_adr_user:
-        member = await guild.fetch_member(max_adr_user)
+        member = await grabTargetUser(max_adr_user)
         response_msg.add_field(name="The Punisher",value=f"The Punisher is the same as before. ```{member.name}```",inline=False)
     else:
-        oldmember = await guild.fetch_member(current_punisher)
+        oldmember = await grabTargetUser(current_punisher)
         user_list[current_punisher]['punisher'] = 0
-        newmember = await guild.fetch_member(max_adr_user)
+        newmember = await grabTargetUser(max_adr_user)
         await discordReplaceRole("The Terminator",oldmember,newmember,guild)
         response_msg.add_field(name="The Punisher",value=f"Previous Punisher (highest ADR) has been replaced. Congrats! ```{member.name}```",inline=False)
 
