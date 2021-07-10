@@ -239,20 +239,32 @@ async def on_member_join(member):
     await channel.send(embed=response_msg)
 
 # Standard role add a remove function
-async def discordRemoveRole(targetRole, user, ctx):
-    role = discord.utils.get(ctx.guild.roles, name=targetRole)
+async def discordRemoveRole(targetRole, user, ctx=None):
+    if ctx == None:
+        guild = client.get_guild(d_server)
+        role = discord.utils.get(guild.roles, name=targetRole)
+    else:
+        role = discord.utils.get(ctx.guild.roles, name=targetRole)
     await user.remove_roles(role)
 
-async def discordAddRole(targetRole, user, ctx):
-    role = discord.utils.get(ctx.guild.roles, name=targetRole)
+async def discordAddRole(targetRole, user, ctx=None):
+    if ctx == None:
+        guild = client.get_guild(d_server)
+        role = discord.utils.get(guild.roles, name=targetRole)
+    else:
+        role = discord.utils.get(ctx.guild.roles, name=targetRole)
     await user.add_roles(role)
 
-async def discordRemoveAndAddRole(removeRole,targetRole,user, ctx):
+async def discordRemoveAndAddRole(removeRole,targetRole,user, ctx=None):
     await discordRemoveRole(removeRole,user,ctx)
     await discordAddRole(targetRole,user,ctx)
 
-async def discordReplaceRole(targetRole, olduser, newuser, ctx):
-    role = discord.utils.get(ctx.guild.roles, name=targetRole)
+async def discordReplaceRole(targetRole, olduser, newuser, ctx=None):
+    if ctx == None:
+        guild = client.get_guild(d_server)
+        role = discord.utils.get(guild.roles, name=targetRole)
+    else:
+        role = discord.utils.get(ctx.guild.roles, name=targetRole)
     await discordRemoveRole(role,olduser,ctx)
     await discordAddRole(role,newuser,ctx)
 
@@ -267,11 +279,11 @@ async def on_member_update(before, after):
     if discord.ActivityType.streaming in activities:
         if streaming_role not in after.roles:
             print(f"{after.display_name} is streaming")
-            await discordAddRole('Streaming',member,guild)
+            await discordAddRole('Streaming',member)
     else:
         if streaming_role in after.roles:
             print(f"{after.display_name} is not streaming")
-            await discordRemoveRole('Streaming',member,guild)
+            await discordRemoveRole('Streaming',member)
 
 # Ban function
 @client.command()
@@ -637,7 +649,7 @@ async def update():
             role = discord.utils.get(guild.roles, name=curr_rank)
             print('Updating: ' + user)
             member = await guild.fetch_member(user)
-            await discordRemoveAndAddRole(curr_rank,playerStats.pStats.new_rank,member,guild)
+            await discordRemoveAndAddRole(curr_rank,playerStats.pStats.new_rank,member)
     
     user_list = user_list_na
 
@@ -722,7 +734,7 @@ async def update():
     #Terminator work
     if current_terminator == 'None':
         member = await guild.fetch_member(max_kda_user)
-        await discordAddRole('The Terminator',member,guild)
+        await discordAddRole('The Terminator',member)
         response_msg.add_field(name="The Terminator",value=f"A new The Terminator role (highest KDA) has been assigned. Congrats! ```{member.name}```",inline=False)
     elif current_terminator == max_kda_user:
         member = await guild.fetch_member(max_kda_user)
@@ -731,7 +743,7 @@ async def update():
         oldmember = await guild.fetch_member(current_terminator)
         user_list[current_terminator]['terminator'] = 0
         newmember = await guild.fetch_member(max_kda_user)
-        await discordReplaceRole("The Terminator",oldmember,newmember,guild)
+        await discordReplaceRole("The Terminator",oldmember,newmember)
         response_msg.add_field(name="The Terminator",value=f"Previous Terminator (highest KDA) has been replaced. Congrats! ```{member.name}```",inline=False)
 
     max_adr = 0
