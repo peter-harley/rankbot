@@ -1,6 +1,6 @@
 # RankedBot
-# Version: 2.0
-# Date: 30.06.21
+# Version: 2.2
+# Date: 10.10.21
 # Current Authors: fury#1662, fingers_#5020
 # fingers making the improvements!
 # Github: https://github.com/furyaus/rankbot
@@ -60,6 +60,9 @@ loop_timer = 0.05 #0.05 is 5 minutes #0.005 is 30 seconds
 keys = ["Bearer " + API_key_fury, "Bearer " + API_key_ocker, "Bearer " + API_key_p4, "Bearer " + API_key_progdog, "Bearer " + API_key_fingers]
 header = {"Authorization": "Bearer " + API_key_fury,"Accept": "application/vnd.api+json"}
 
+
+# Standard bot reponse message embed format
+
 def helpmsg(titleText=None,descText=None):
     if(titleText==None and descText==None):
         help_msg = discord.Embed(colour=discord.Colour.orange())
@@ -71,6 +74,7 @@ def helpmsg(titleText=None,descText=None):
         help_msg = discord.Embed(colour=discord.Colour.orange(),title=titleText,description=descText)
     help_msg.set_thumbnail(url="https://i.ibb.co/BNrSMdN/101-logo.png")
     return help_msg
+
 
 def respmsg(titleText=None,descText=None):
     if(titleText==None and descText==None):
@@ -116,31 +120,35 @@ async def on_error(event, *args, **kwargs):
 # Help
 @client.command()
 async def help(ctx):
-    help_msg = helpmsg("Help for Rank Bot","Rank Bot manages the roles, ranks and other stats for gamers in The 101 Club.")
-    help_msg.add_field(name=".link",value="This links your discord userid with your PUBG in-game name. ```.link furyaus```",inline=False)
-    help_msg.add_field(name=".stats",value="Retireve live PUBG API data for a single user and display. No stats, ranks or roles are changed or stored. ```.stats 0cker```",inline=False)
-    help_msg.add_field(name=".mystats",value="Queries PUBG API for your latest data, updates ranks, roles and stats which are stored via a JSON file. ```.mystats```",inline=False)
-    help_msg.add_field(name=".inspire",value="Responses with inspiration quotes, to really get you back on track for that chicken dinner.```.inspire```",inline=False)
-    help_msg.add_field(name="Report issues",value="Head to github and create a new issue or feature request [https://github.com/furyaus/rankbot/issues](https://github.com/furyaus/rankbot/issues)",inline=False)
-    help_msg.timestamp = datetime.datetime.utcnow()
-    await ctx.send(embed=help_msg)
+
+    response_msg = respmsg("Help for Rank Bot","Rank Bot manages the roles, ranks and other stats for gamers in The 101 Club.")
+    response_msg.add_field(name=".link",value="This links your discord userid with your PUBG in-game name. ```.link furyaus```",inline=False)
+    response_msg.add_field(name=".stats",value="Retireve live PUBG API data for a single user and display. No stats, ranks or roles are changed or stored. ```.stats 0cker```",inline=False)
+    response_msg.add_field(name=".mystats",value="Queries PUBG API for your latest data, updates ranks, roles and stats which are stored via a JSON file. ```.mystats```",inline=False)
+    response_msg.add_field(name=".inspire",value="Responses with inspiration quotes, to really get you back on track for that chicken dinner.```.inspire```",inline=False)
+    response_msg.add_field(name="Report issues",value="Head to github and create a new issue or feature request [https://github.com/furyaus/rankbot/issues](https://github.com/furyaus/rankbot/issues)",inline=False)
+    response_msg.timestamp = datetime.datetime.utcnow()
+    await ctx.send(embed=response_msg)
+
 
 # Admin help
 @client.command()
 @commands.has_any_role(admin_roles[0], admin_roles[1], admin_roles[2], admin_roles[3], admin_roles[4], admin_roles[5])
 async def adminhelp(ctx):
-    help_msg = helpmsg("Admin help for Rank Bot","Admin users can remove users and call for global updates.")
-    help_msg.add_field(name=".linked",value="Returns the total number of currently stored users in JSON file. ```.linked```",inline=False)
-    help_msg.add_field(name=".say",value="Allows admin to message any channel. Can take channel name or channel ID. Look out for icons when using channel name. 1024 character limit. ```.say channel_name message```",inline=False)
-    help_msg.add_field(name=".announce",value="Allows admin to send a announcement to the announcement channel only. 1024 character limit. ```.announce message```",inline=False)
-    help_msg.add_field(name=".norequests",value="Returns the total number of requests made to the PUG API. ```.norequests```",inline=False)
-    help_msg.add_field(name=".userinfo",value="Caculates the creation date and join date of user for 101 Club. ```.userinfo GAMMB1T```",inline=False)
-    help_msg.add_field(name=".ban",value="Bans a user and logs why into the bot-log channel. ```.ban 0cker Because he sucks```",inline=False)
-    help_msg.add_field(name=".unban",value="Unbans a user and direct messages them to rejoin via invite. ```.unban 0cker```",inline=False)
-    help_msg.add_field(name=".remove",value="Will allow admin to remove link between Discord user id and PUBG IGN. User can then complete a link again. ```.remove @P4```",inline=False)
-    help_msg.add_field(name=".resync",value="This will force a full resync for all stored players with PUBG API. 50 users per minute, wait till complete. ```.resync```",inline=False)
-    help_msg.timestamp = datetime.datetime.utcnow()
-    await ctx.send(embed=help_msg)
+
+    response_msg = respmsg("Admin help for Rank Bot","Admin users can remove users and call for global updates.")
+    response_msg.add_field(name=".linked",value="Returns the total number of currently stored users in JSON file. ```.linked```",inline=False)
+    response_msg.add_field(name=".say",value="Allows admin to message any channel. Can take channel name or channel ID. Look out for icons when using channel name. 1024 character limit. ```.say channel_name message```",inline=False)
+    response_msg.add_field(name=".announce",value="Allows admin to send a announcement to the announcement channel only. 1024 character limit. ```.announce message```",inline=False)
+    response_msg.add_field(name=".norequests",value="Returns the total number of requests made to the PUG API. ```.norequests```",inline=False)
+    response_msg.add_field(name=".userinfo",value="Caculates the creation date and join date of user for 101 Club. ```.userinfo GAMMB1T```",inline=False)
+    response_msg.add_field(name=".ban",value="Bans a user and logs why into the bot-log channel. ```.ban 0cker Because he sucks```",inline=False)
+    response_msg.add_field(name=".unban",value="Unbans a user and direct messages them to rejoin via invite. ```.unban 0cker```",inline=False)
+    response_msg.add_field(name=".remove",value="Will allow admin to remove link between Discord user id and PUBG IGN. User can then complete a link again. ```.remove @P4```",inline=False)
+    response_msg.add_field(name=".resync",value="This will force a full resync for all stored players with PUBG API. 50 users per minute, wait till complete. ```.resync```",inline=False)
+    response_msg.timestamp = datetime.datetime.utcnow()
+    await ctx.send(embed=response_msg)
+
 
 # Inspire your day
 @client.command()
@@ -226,13 +234,13 @@ async def on_member_remove(member):
     response_msg.timestamp = datetime.datetime.utcnow()
     await channel.send(embed=response_msg)
 
+
 # On member join add role and report
 @client.event
 async def on_member_join(member):
     guild = client.get_guild(d_server)
     channel = client.get_channel(botlog_channel)
-    role = discord.utils.get(guild.roles, name='101 Club')
-    await discordAddRole('101 Club',member,guild)
+    await discordAddRole('101 Club',member)
     response_msg = respmsg()
     response_msg.add_field(name="Server join", value=f"{member.name}", inline=False)
     response_msg.timestamp = datetime.datetime.utcnow()
@@ -279,25 +287,23 @@ async def discordReplaceRole(targetRole, olduser, newuser, ctx=None):
     await discordRemoveRole(role,olduser,ctx)
     await discordAddRole(role,newuser,ctx)
 
-
 # Streaming Role
 @client.event
 async def on_member_update(before, after):
     guild = client.get_guild(d_server)
     streaming_role = discord.utils.get(guild.roles, name='Streaming')
-    activities = after.activities
     after_id = after.id
-    print('Fetching member info for {0}'.format(after_id))
     member = await grabTargetUser(after_id)
-    if member != None:
-        if discord.ActivityType.streaming in activities:
-            if streaming_role not in after.roles:
-                print(f"{after.display_name} is streaming")
-                await discordAddRole('Streaming',member)
-        else:
-            if streaming_role in after.roles:
-                print(f"{after.display_name} is not streaming")
-                await discordRemoveRole('Streaming',member)
+    streaming = [i for i in after.activities if str(i.type) == "ActivityType.streaming"]
+    if streaming:
+        if streaming_role not in after.roles:
+            print(f"{after.display_name} is streaming")
+            await discordAddRole('Streaming',member)
+    else:
+        if streaming_role in after.roles:
+            print(f"{after.display_name} is not streaming")
+            await discordRemoveRole('Streaming',member)
+            
 
 # Ban function
 @client.command()
@@ -377,6 +383,26 @@ async def userinfo(ctx, member: discord.Member):
     response_msg.add_field(name="Roles", value=f"{member.name} has the following roles: "+roles, inline=False)
     response_msg.timestamp = datetime.datetime.utcnow()
     await ctx.send(embed=response_msg)
+
+
+# User def
+def updateUserList(user_list, user_id, user_ign, player_id, playerStats, curr_punisher=0, curr_terminator=0, curr_general=0):
+    user_list.update({str(user_id): {'IGN': user_ign,'ID': player_id,'Rank': playerStats.pStats.new_rank}})
+    user_list[str(user_id)]['c_rank'] = playerStats.pStats.c_rank
+    user_list[str(user_id)]['c_tier'] = playerStats.pStats.c_tier
+    user_list[str(user_id)]['c_rank_points'] = playerStats.pStats.c_rank_points
+    user_list[str(user_id)]['h_rank'] = playerStats.pStats.h_rank
+    user_list[str(user_id)]['h_tier'] = playerStats.pStats.h_tier
+    user_list[str(user_id)]['h_rank_points'] = playerStats.pStats.h_rank_points
+    user_list[str(user_id)]['games_played'] = playerStats.pStats.games_played
+    user_list[str(user_id)]['season_wins'] = playerStats.pStats.season_wins
+    user_list[str(user_id)]['KDA'] = playerStats.pStats.KDA
+    user_list[str(user_id)]['ADR'] = playerStats.pStats.ADR
+    user_list[str(user_id)]['punisher'] = curr_punisher
+    user_list[str(user_id)]['terminator'] = curr_terminator
+    user_list[str(user_id)]['general'] = curr_general
+    user_list[str(user_id)]['team_kills'] = playerStats.pStats.team_kills
+    return user_list
 
 # Top 25 Updates
 @tasks.loop(hours=loop_timer)
@@ -559,24 +585,6 @@ async def debugmessage(ctx,message):
     if(debugmode == 1):
         await ctx.send(message)
 
-# User def
-def updateUserList(user_list, user_id, user_ign, player_id, playerStats, curr_punisher=0, curr_terminator=0, curr_general=0):
-    user_list.update({str(user_id): {'IGN': user_ign,'ID': player_id,'Rank': playerStats.pStats.new_rank}})
-    user_list[str(user_id)]['c_rank'] = playerStats.pStats.c_rank
-    user_list[str(user_id)]['c_tier'] = playerStats.pStats.c_tier
-    user_list[str(user_id)]['c_rank_points'] = playerStats.pStats.c_rank_points
-    user_list[str(user_id)]['h_rank'] = playerStats.pStats.h_rank
-    user_list[str(user_id)]['h_tier'] = playerStats.pStats.h_tier
-    user_list[str(user_id)]['h_rank_points'] = playerStats.pStats.h_rank_points
-    user_list[str(user_id)]['games_played'] = playerStats.pStats.games_played
-    user_list[str(user_id)]['season_wins'] = playerStats.pStats.season_wins
-    user_list[str(user_id)]['KDA'] = playerStats.pStats.KDA
-    user_list[str(user_id)]['ADR'] = playerStats.pStats.ADR
-    user_list[str(user_id)]['punisher'] = curr_punisher
-    user_list[str(user_id)]['terminator'] = curr_terminator
-    user_list[str(user_id)]['general'] = curr_general
-    user_list[str(user_id)]['team_kills'] = playerStats.pStats.team_kills
-    return user_list
 
 # Pull stats for current user and update database
 @client.command()
@@ -669,6 +677,8 @@ async def update():
 
     #############################################################
     # Bittne off more then I can chew here, I want to revist this role part and make it easier use less code for each
+    # Ahh I feel like that every time I work on any project, that is currently working but at the same time
+    # I want it to be more optimsed and better!!!
     #############################################################
     # unique_member_titles = ['The General','The Terminator','The Punisher']
     #Default each title to None
