@@ -60,7 +60,22 @@ loop_timer = 0.05 #0.05 is 5 minutes #0.005 is 30 seconds
 keys = ["Bearer " + API_key_fury, "Bearer " + API_key_ocker, "Bearer " + API_key_p4, "Bearer " + API_key_progdog, "Bearer " + API_key_fingers]
 header = {"Authorization": "Bearer " + API_key_fury,"Accept": "application/vnd.api+json"}
 
+
 # Standard bot reponse message embed format
+
+def helpmsg(titleText=None,descText=None):
+    if(titleText==None and descText==None):
+        help_msg = discord.Embed(colour=discord.Colour.orange())
+    if(titleText!=None and descText==None):
+        help_msg = discord.Embed(colour=discord.Colour.orange(),title=titleText)
+    if(titleText==None and descText!=None):
+        help_msg = discord.Embed(colour=discord.Colour.orange(),description=descText)
+    if(titleText!=None and descText!=None):
+        help_msg = discord.Embed(colour=discord.Colour.orange(),title=titleText,description=descText)
+    help_msg.set_thumbnail(url="https://i.ibb.co/BNrSMdN/101-logo.png")
+    return help_msg
+
+
 def respmsg(titleText=None,descText=None):
     if(titleText==None and descText==None):
         response_msg = discord.Embed(colour=discord.Colour.orange())
@@ -105,6 +120,7 @@ async def on_error(event, *args, **kwargs):
 # Help
 @client.command()
 async def help(ctx):
+
     response_msg = respmsg("Help for Rank Bot","Rank Bot manages the roles, ranks and other stats for gamers in The 101 Club.")
     response_msg.add_field(name=".link",value="This links your discord userid with your PUBG in-game name. ```.link furyaus```",inline=False)
     response_msg.add_field(name=".stats",value="Retireve live PUBG API data for a single user and display. No stats, ranks or roles are changed or stored. ```.stats 0cker```",inline=False)
@@ -114,10 +130,12 @@ async def help(ctx):
     response_msg.timestamp = datetime.datetime.utcnow()
     await ctx.send(embed=response_msg)
 
+
 # Admin help
 @client.command()
 @commands.has_any_role(admin_roles[0], admin_roles[1], admin_roles[2], admin_roles[3], admin_roles[4], admin_roles[5])
 async def adminhelp(ctx):
+
     response_msg = respmsg("Admin help for Rank Bot","Admin users can remove users and call for global updates.")
     response_msg.add_field(name=".linked",value="Returns the total number of currently stored users in JSON file. ```.linked```",inline=False)
     response_msg.add_field(name=".say",value="Allows admin to message any channel. Can take channel name or channel ID. Look out for icons when using channel name. 1024 character limit. ```.say channel_name message```",inline=False)
@@ -130,6 +148,7 @@ async def adminhelp(ctx):
     response_msg.add_field(name=".resync",value="This will force a full resync for all stored players with PUBG API. 50 users per minute, wait till complete. ```.resync```",inline=False)
     response_msg.timestamp = datetime.datetime.utcnow()
     await ctx.send(embed=response_msg)
+
 
 # Inspire your day
 @client.command()
@@ -215,12 +234,13 @@ async def on_member_remove(member):
     response_msg.timestamp = datetime.datetime.utcnow()
     await channel.send(embed=response_msg)
 
+
 # On member join add role and report
 @client.event
 async def on_member_join(member):
     guild = client.get_guild(d_server)
     channel = client.get_channel(botlog_channel)
-    await discordAddRole('101 Club',member,guild)
+    await discordAddRole('101 Club',member)
     response_msg = respmsg()
     response_msg.add_field(name="Server join", value=f"{member.name}", inline=False)
     response_msg.timestamp = datetime.datetime.utcnow()
@@ -283,6 +303,7 @@ async def on_member_update(before, after):
         if streaming_role in after.roles:
             print(f"{after.display_name} is not streaming")
             await discordRemoveRole('Streaming',member)
+            
 
 # Ban function
 @client.command()
@@ -362,6 +383,7 @@ async def userinfo(ctx, member: discord.Member):
     response_msg.add_field(name="Roles", value=f"{member.name} has the following roles: "+roles, inline=False)
     response_msg.timestamp = datetime.datetime.utcnow()
     await ctx.send(embed=response_msg)
+
 
 # User def
 def updateUserList(user_list, user_id, user_ign, player_id, playerStats, curr_punisher=0, curr_terminator=0, curr_general=0):
@@ -563,6 +585,7 @@ async def debugmessage(ctx,message):
     if(debugmode == 1):
         await ctx.send(message)
 
+
 # Pull stats for current user and update database
 @client.command()
 async def mystats(ctx):
@@ -645,6 +668,7 @@ async def update():
         #Def to update all user information from stats class
         user_list_na = updateUserList(user_list, user, user_ign, player_id, playerStats, curr_punisher, curr_terminator, curr_general)
         if playerStats.pStats.new_rank != curr_rank:
+            role = discord.utils.get(guild.roles, name=curr_rank)
             member = await grabTargetUser(user)
             if(member != None):
                 await discordRemoveAndAddRole(curr_rank,playerStats.pStats.new_rank,member)
